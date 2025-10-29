@@ -1,4 +1,4 @@
--- Auto Fishing Script with New Mechanics & Draggable UI + Anti-AFK Toggle
+-- Auto Fishing Script with New Mechanics & Draggable UI + Anti-AFK Toggle + Sell Fish by Rarity UI
 local player = game:GetService("Players").LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local backpack = player.Backpack
@@ -14,7 +14,6 @@ local mechanics = tool:WaitForChild("Mechanics")
 local remotes = mechanics:WaitForChild("Remotes")
 local castEvent = remotes:WaitForChild("CastEvent")
 local miniGameRemote = remotes:WaitForChild("MiniGame")
-
 local requestFishAnnouncement = game:GetService("ReplicatedStorage"):WaitForChild("RequestFishAnnouncement")
 
 -- Buat ScreenGui
@@ -23,8 +22,8 @@ screenGui.Name = "AutoFishingUI"
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 290)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -145)
+mainFrame.Size = UDim2.new(0, 300, 0, 450)  -- Diperbesar untuk menampung tombol sell
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -225)
 mainFrame.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
 mainFrame.BorderSizePixel = 0
 mainFrame.BackgroundTransparency = 0.1
@@ -115,6 +114,94 @@ antiAFKToggle.Font = Enum.Font.SourceSans
 antiAFKToggle.TextSize = 16
 antiAFKToggle.Parent = mainFrame
 
+-- Label Sell Fish
+local sellLabel = Instance.new("TextLabel")
+sellLabel.Size = UDim2.new(1, 0, 0, 30)
+sellLabel.Position = UDim2.new(0, 0, 0, 250)
+sellLabel.BackgroundTransparency = 1
+sellLabel.Text = "Sell Fish by Rarity:"
+sellLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+sellLabel.Font = Enum.Font.SourceSansBold
+sellLabel.TextSize = 18
+sellLabel.Parent = mainFrame
+
+-- Tombol Sell Common (Gray)
+local sellCommon = Instance.new("TextButton")
+sellCommon.Size = UDim2.new(0, 60, 0, 30)
+sellCommon.Position = UDim2.new(0, 20, 0, 290)
+sellCommon.BackgroundColor3 = Color3.fromRGB(128, 128, 128)  -- Gray
+sellCommon.Text = "Common"
+sellCommon.TextColor3 = Color3.fromRGB(255, 255, 255)
+sellCommon.Font = Enum.Font.SourceSans
+sellCommon.TextSize = 14
+sellCommon.Parent = mainFrame
+
+-- Tombol Sell UnCommon (Green)
+local sellUnCommon = Instance.new("TextButton")
+sellUnCommon.Size = UDim2.new(0, 60, 0, 30)
+sellUnCommon.Position = UDim2.new(0, 90, 0, 290)
+sellUnCommon.BackgroundColor3 = Color3.fromRGB(0, 204, 0)  -- Green
+sellUnCommon.Text = "UnCommon"
+sellUnCommon.TextColor3 = Color3.fromRGB(255, 255, 255)
+sellUnCommon.Font = Enum.Font.SourceSans
+sellUnCommon.TextSize = 14
+sellUnCommon.Parent = mainFrame
+
+-- Tombol Sell Rare (White)
+local sellRare = Instance.new("TextButton")
+sellRare.Size = UDim2.new(0, 60, 0, 30)
+sellRare.Position = UDim2.new(0, 160, 0, 290)
+sellRare.BackgroundColor3 = Color3.fromRGB(255, 255, 255)  -- White
+sellRare.Text = "Rare"
+sellRare.TextColor3 = Color3.fromRGB(0, 0, 0)  -- Black text for contrast
+sellRare.Font = Enum.Font.SourceSans
+sellRare.TextSize = 14
+sellRare.Parent = mainFrame
+
+-- Tombol Sell Epic (Purple)
+local sellEpic = Instance.new("TextButton")
+sellEpic.Size = UDim2.new(0, 60, 0, 30)
+sellEpic.Position = UDim2.new(0, 230, 0, 290)
+sellEpic.BackgroundColor3 = Color3.fromRGB(128, 0, 128)  -- Purple
+sellEpic.Text = "Epic"
+sellEpic.TextColor3 = Color3.fromRGB(255, 255, 255)
+sellEpic.Font = Enum.Font.SourceSans
+sellEpic.TextSize = 14
+sellEpic.Parent = mainFrame
+
+-- Tombol Sell Legendary (Orange)
+local sellLegendary = Instance.new("TextButton")
+sellLegendary.Size = UDim2.new(0, 60, 0, 30)
+sellLegendary.Position = UDim2.new(0, 20, 0, 330)
+sellLegendary.BackgroundColor3 = Color3.fromRGB(255, 165, 0)  -- Orange
+sellLegendary.Text = "Legendary"
+sellLegendary.TextColor3 = Color3.fromRGB(255, 255, 255)
+sellLegendary.Font = Enum.Font.SourceSans
+sellLegendary.TextSize = 14
+sellLegendary.Parent = mainFrame
+
+-- Tombol Sell Mythical (Yellow)
+local sellMythical = Instance.new("TextButton")
+sellMythical.Size = UDim2.new(0, 60, 0, 30)
+sellMythical.Position = UDim2.new(0, 90, 0, 330)
+sellMythical.BackgroundColor3 = Color3.fromRGB(255, 255, 0)  -- Yellow
+sellMythical.Text = "Mythical"
+sellMythical.TextColor3 = Color3.fromRGB(0, 0, 0)  -- Black text for contrast
+sellMythical.Font = Enum.Font.SourceSans
+sellMythical.TextSize = 14
+sellMythical.Parent = mainFrame
+
+-- Tombol Sell Secret (Cyan)
+local sellSecret = Instance.new("TextButton")
+sellSecret.Size = UDim2.new(0, 60, 0, 30)
+sellSecret.Position = UDim2.new(0, 160, 0, 330)
+sellSecret.BackgroundColor3 = Color3.fromRGB(0, 255, 255)  -- Cyan
+sellSecret.Text = "Secret"
+sellSecret.TextColor3 = Color3.fromRGB(0, 0, 0)  -- Black text for contrast
+sellSecret.Font = Enum.Font.SourceSans
+sellSecret.TextSize = 14
+sellSecret.Parent = mainFrame
+
 -- Variabel kontrol
 local isFishing = false
 local announceEnabled = true
@@ -124,127 +211,174 @@ local antiAFKConnection
 
 -- Fungsi cari ikan
 local function getLatestFish()
-	for _, item in pairs(backpack:GetChildren()) do
-		if item:IsA("Tool") and item.Name:find("kg") then
-			return item
-		end
-	end
-	return nil
+    for _, item in pairs(backpack:GetChildren()) do
+        if item:IsA("Tool") and item.Name:find("kg") then
+            return item
+        end
+    end
+    return nil
 end
 
 -- Fungsi utama auto fishing
 local function autoFish()
-	if tool.Parent ~= character then
-		tool.Parent = character
-		wait(0.5)
-	end
-	castEvent:FireServer(false, 100)
-	wait(2)
-	wait(3)
-	miniGameRemote:FireServer(true)
-	wait(1)
-	if announceEnabled then
-		local fish = getLatestFish()
-		if fish then
-			requestFishAnnouncement:FireServer(fish)
-		end
-	end
+    if tool.Parent ~= character then
+        tool.Parent = character
+        wait(0.5)
+    end
+    castEvent:FireServer(false, 100)
+    wait(2)
+    wait(3)
+    miniGameRemote:FireServer(true)
+    wait(1)
+    if announceEnabled then
+        local fish = getLatestFish()
+        if fish then
+            requestFishAnnouncement:FireServer(fish)
+        end
+    end
 end
 
 -- Tombol Start
 startButton.MouseButton1Click:Connect(function()
-	if not isFishing then
-		isFishing = true
-		statusLabel.Text = "Status: Fishing Active"
-		statusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-		fishingLoop = task.spawn(function()
-			while isFishing do
-				autoFish()
-				wait(0.5)
-			end
-		end)
-	end
+    if not isFishing then
+        isFishing = true
+        statusLabel.Text = "Status: Fishing Active"
+        statusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+        fishingLoop = task.spawn(function()
+            while isFishing do
+                autoFish()
+                wait(0.5)
+            end
+        end)
+    end
 end)
 
 -- Tombol Stop
 stopButton.MouseButton1Click:Connect(function()
-	if isFishing then
-		isFishing = false
-		statusLabel.Text = "Status: Stopped"
-		statusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
-		if fishingLoop then task.cancel(fishingLoop) end
-	end
+    if isFishing then
+        isFishing = false
+        statusLabel.Text = "Status: Stopped"
+        statusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+        if fishingLoop then
+            task.cancel(fishingLoop)
+        end
+    end
 end)
 
 -- Toggle Announcement
 announceToggle.MouseButton1Click:Connect(function()
-	announceEnabled = not announceEnabled
-	announceToggle.Text = announceEnabled and "Announcement: ON" or "Announcement: OFF"
-	announceToggle.BackgroundColor3 = announceEnabled and Color3.fromRGB(102, 102, 204) or Color3.fromRGB(153, 153, 153)
+    announceEnabled = not announceEnabled
+    announceToggle.Text = announceEnabled and "Announcement: ON" or "Announcement: OFF"
+    announceToggle.BackgroundColor3 = announceEnabled and Color3.fromRGB(102, 102, 204) or Color3.fromRGB(153, 153, 153)
 end)
 
 -- Toggle Anti-AFK
 antiAFKToggle.MouseButton1Click:Connect(function()
-	antiAFKEnabled = not antiAFKEnabled
-	antiAFKToggle.Text = antiAFKEnabled and "Anti-AFK: ON" or "Anti-AFK: OFF"
-	antiAFKToggle.BackgroundColor3 = antiAFKEnabled and Color3.fromRGB(0, 153, 255) or Color3.fromRGB(120, 120, 120)
-
-	if antiAFKEnabled then
-		-- Aktifkan kembali Anti-AFK
-		local VU = game:GetService("VirtualUser")
-		antiAFKConnection = player.Idled:Connect(function()
-			VU:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-			wait(1)
-			VU:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-			print("[ANTI-AFK] Aktivitas simulasi dikirim.")
-		end)
-	else
-		-- Nonaktifkan Anti-AFK
-		if antiAFKConnection then
-			antiAFKConnection:Disconnect()
-			antiAFKConnection = nil
-			print("[ANTI-AFK] Dinonaktifkan oleh pengguna.")
-		end
-	end
+    antiAFKEnabled = not antiAFKEnabled
+    antiAFKToggle.Text = antiAFKEnabled and "Anti-AFK: ON" or "Anti-AFK: OFF"
+    antiAFKToggle.BackgroundColor3 = antiAFKEnabled and Color3.fromRGB(0, 153, 255) or Color3.fromRGB(120, 120, 120)
+    if antiAFKEnabled then
+        -- Aktifkan kembali Anti-AFK
+        local VU = game:GetService("VirtualUser")
+        antiAFKConnection = player.Idled:Connect(function()
+            VU:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+            wait(1)
+            VU:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+            print("[ANTI-AFK] Aktivitas simulasi dikirim.")
+        end)
+    else
+        -- Nonaktifkan Anti-AFK
+        if antiAFKConnection then
+            antiAFKConnection:Disconnect()
+            antiAFKConnection = nil
+            print("[ANTI-AFK] Dinonaktifkan oleh pengguna.")
+        end
+    end
 end)
 
 -- Inisialisasi Anti-AFK default ON
 task.spawn(function()
-	local VU = game:GetService("VirtualUser")
-	antiAFKConnection = player.Idled:Connect(function()
-		if antiAFKEnabled then
-			VU:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-			wait(1)
-			VU:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-			print("[ANTI-AFK] Aktivitas simulasi dikirim.")
-		end
-	end)
+    local VU = game:GetService("VirtualUser")
+    antiAFKConnection = player.Idled:Connect(function()
+        if antiAFKEnabled then
+            VU:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+            wait(1)
+            VU:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+            print("[ANTI-AFK] Aktivitas simulasi dikirim.")
+        end
+    end)
+end)
+
+-- Fungsi Sell Rarity
+local function sellRarity(rarity)
+    local args = { rarity }
+    game:GetService("ReplicatedStorage"):WaitForChild("RequestSellRarity"):InvokeServer(unpack(args))
+    print("Sold " .. rarity .. " fish.")
+end
+
+-- Tombol Sell Common
+sellCommon.MouseButton1Click:Connect(function()
+    sellRarity("Common")
+end)
+
+-- Tombol Sell UnCommon
+sellUnCommon.MouseButton1Click:Connect(function()
+    sellRarity("UnCommon")
+end)
+
+-- Tombol Sell Rare
+sellRare.MouseButton1Click:Connect(function()
+    sellRarity("Rare")
+end)
+
+-- Tombol Sell Epic
+sellEpic.MouseButton1Click:Connect(function()
+    sellRarity("Epic")
+end)
+
+-- Tombol Sell Legendary
+sellLegendary.MouseButton1Click:Connect(function()
+    sellRarity("Legendary")
+end)
+
+-- Tombol Sell Mythical
+sellMythical.MouseButton1Click:Connect(function()
+    sellRarity("Mythical")
+end)
+
+-- Tombol Sell Secret
+sellSecret.MouseButton1Click:Connect(function()
+    sellRarity("Secret")
 end)
 
 -- Tombol Close
 closeButton.MouseButton1Click:Connect(function()
-	if isFishing then
-		isFishing = false
-		if fishingLoop then task.cancel(fishingLoop) end
-	end
-	if antiAFKConnection then
-		antiAFKConnection:Disconnect()
-	end
-	screenGui:Destroy()
+    if isFishing then
+        isFishing = false
+        if fishingLoop then
+            task.cancel(fishingLoop)
+        end
+    end
+    if antiAFKConnection then
+        antiAFKConnection:Disconnect()
+    end
+    screenGui:Destroy()
 end)
 
 -- Efek Hover
 local function hoverEffect(button, normalColor, hoverColor)
-	button.MouseEnter:Connect(function() button.BackgroundColor3 = hoverColor end)
-	button.MouseLeave:Connect(function()
-		if button == announceToggle then
-			button.BackgroundColor3 = announceEnabled and normalColor or Color3.fromRGB(153, 153, 153)
-		elseif button == antiAFKToggle then
-			button.BackgroundColor3 = antiAFKEnabled and normalColor or Color3.fromRGB(120, 120, 120)
-		else
-			button.BackgroundColor3 = normalColor
-		end
-	end)
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = hoverColor
+    end)
+    button.MouseLeave:Connect(function()
+        if button == announceToggle then
+            button.BackgroundColor3 = announceEnabled and normalColor or Color3.fromRGB(153, 153, 153)
+        elseif button == antiAFKToggle then
+            button.BackgroundColor3 = antiAFKEnabled and normalColor or Color3.fromRGB(120, 120, 120)
+        else
+            button.BackgroundColor3 = normalColor
+        end
+    end)
 end
 
 hoverEffect(startButton, Color3.fromRGB(0, 204, 0), Color3.fromRGB(0, 255, 0))
@@ -252,6 +386,13 @@ hoverEffect(stopButton, Color3.fromRGB(204, 0, 0), Color3.fromRGB(255, 0, 0))
 hoverEffect(closeButton, Color3.fromRGB(204, 0, 0), Color3.fromRGB(255, 0, 0))
 hoverEffect(announceToggle, Color3.fromRGB(102, 102, 204), Color3.fromRGB(128, 128, 255))
 hoverEffect(antiAFKToggle, Color3.fromRGB(0, 153, 255), Color3.fromRGB(51, 204, 255))
+hoverEffect(sellCommon, Color3.fromRGB(128, 128, 128), Color3.fromRGB(160, 160, 160))
+hoverEffect(sellUnCommon, Color3.fromRGB(0, 204, 0), Color3.fromRGB(0, 255, 0))
+hoverEffect(sellRare, Color3.fromRGB(255, 255, 255), Color3.fromRGB(220, 220, 220))
+hoverEffect(sellEpic, Color3.fromRGB(128, 0, 128), Color3.fromRGB(160, 0, 160))
+hoverEffect(sellLegendary, Color3.fromRGB(255, 165, 0), Color3.fromRGB(255, 200, 0))
+hoverEffect(sellMythical, Color3.fromRGB(255, 255, 0), Color3.fromRGB(220, 220, 0))
+hoverEffect(sellSecret, Color3.fromRGB(0, 255, 255), Color3.fromRGB(0, 220, 220))
 
 -- Animasi Fade-In
 mainFrame.BackgroundTransparency = 1
@@ -260,4 +401,4 @@ for i = 1, 0, -0.05 do
 	wait(0.05)
 end
 
-print("✅ Auto Fishing UI Loaded! Anti-AFK Toggle tersedia.")
+print("✅ Auto Fishing UI Loaded!")
