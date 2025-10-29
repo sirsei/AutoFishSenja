@@ -3,9 +3,9 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 -- Create the main window
 local Window = Rayfield:CreateWindow({
-    Name = "SeiAUTOFISH V1",
+    Name = "SENJA AUTOFISH V1",
     LoadingTitle = "Loading SeiAUTOFISH...",
-    LoadingSubtitle = "by YourName",
+    LoadingSubtitle = "by Sei",
     ConfigurationSaving = {
         Enabled = true,
         FolderName = "SeiAUTOFISH",
@@ -114,6 +114,7 @@ end)
 -- Create Tabs
 local FishingTab = Window:CreateTab("Fishing", 4483362458) -- Icon ID for fishing
 local SellingTab = Window:CreateTab("Selling", 4483362458) -- Icon ID for selling
+local TeleportTab = Window:CreateTab("Teleport", 4483362458) -- Icon ID for teleport
 
 -- Fishing Tab Elements
 FishingTab:CreateSection("Auto Fishing Controls")
@@ -241,6 +242,129 @@ local SellSecretButton = SellingTab:CreateButton({
     Name = "Sell Secret (Cyan)",
     Callback = function()
         sellRarity("Secret")
+    end,
+})
+
+-- Teleport Tab Elements
+TeleportTab:CreateSection("Teleport Locations")
+
+local TeleportPulauDitengahLaut = TeleportTab:CreateButton({
+    Name = "Teleport to Pulau ditengah laut",
+    Callback = function()
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(-2445.55884, -165.058807, 4454.30762, -0.76892525, -3.90055739e-08, -0.639338732, 5.04065722e-09, 1, -6.70715892e-08, 0.639338732, -5.47957235e-08, -0.76892525)
+            Rayfield:Notify({
+                Title = "Teleported",
+                Content = "Teleported to Pulau ditengah laut.",
+                Duration = 3,
+                Image = 4483362458,
+            })
+        end
+    end,
+})
+
+local TeleportCamp = TeleportTab:CreateButton({
+    Name = "Teleport to Camp",
+    Callback = function()
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(65.7638931, -91.0923462, 5332.22705, -0.034528628, -1.2111478e-07, 0.999403715, 1.14577647e-09, 1, 1.21226634e-07, -0.999403715, 5.3308824e-09, -0.034528628)
+            Rayfield:Notify({
+                Title = "Teleported",
+                Content = "Teleported to Camp.",
+                Duration = 3,
+                Image = 4483362458,
+            })
+        end
+    end,
+})
+
+local TeleportTokoPancingan = TeleportTab:CreateButton({
+    Name = "Teleport to Toko Pancingan",
+    Callback = function()
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(965.361572, -147.673538, 3707.81665, 0.42777279, 6.47687486e-08, 0.903886318, -6.42598721e-08, 1, -4.12442631e-08, -0.903886318, -4.04404474e-08, 0.42777279)
+            Rayfield:Notify({
+                Title = "Teleported",
+                Content = "Teleported to Toko Pancingan.",
+                Duration = 3,
+                Image = 4483362458,
+            })
+        end
+    end,
+})
+
+local TeleportPameran = TeleportTab:CreateButton({
+    Name = "Teleport to Pameran",
+    Callback = function()
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(1236.47827, -91.8025131, 2891.3811, -0.0169169009, -8.58965308e-08, -0.999856889, -2.49033558e-08, 1, -8.54874784e-08, 0.999856889, 2.34536088e-08, -0.0169169009)
+            Rayfield:Notify({
+                Title = "Teleported",
+                Content = "Teleported to Pameran.",
+                Duration = 3,
+                Image = 4483362458,
+            })
+        end
+    end,
+})
+
+local TeleportMercusuar = TeleportTab:CreateButton({
+    Name = "Teleport to Mercusuar",
+    Callback = function()
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(-157.251251, -152.903946, 3608.63208, -0.221173435, -3.34229133e-09, 0.975234509, 2.34659137e-08, 1, 8.74900152e-09, -0.975234509, 2.48198155e-08, -0.221173435)
+            Rayfield:Notify({
+                Title = "Teleported",
+                Content = "Teleported to Mercusuar.",
+                Duration = 3,
+                Image = 4483362458,
+            })
+        end
+    end,
+})
+
+local TeleportCassino = TeleportTab:CreateButton({
+    Name = "Teleport to Cassino",
+    Callback = function()
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(1046.57214, -143.381668, 3246.20776, 0.0726584047, 1.44183163e-08, -0.997356892, 4.48612347e-08, 1, 1.77247106e-08, 0.997356892, -4.6030511e-08, 0.0726584047)
+            Rayfield:Notify({
+                Title = "Teleported",
+                Content = "Teleported to Cassino.",
+                Duration = 3,
+                Image = 4483362458,
+            })
+        end
+    end,
+})
+
+local TeleportDermaga1 = TeleportTab:CreateButton({
+    Name = "Teleport to Dermaga 1",
+    Callback = function()
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(378.228333, -160.766098, 3560.79517, -0.100001454, 1.85709013e-08, 0.994987309, 1.54956169e-11, 1, -1.86629041e-08, -0.994987309, -1.85089954e-09, -0.100001454)
+            Rayfield:Notify({
+                Title = "Teleported",
+                Content = "Teleported to Dermaga 1.",
+                Duration = 3,
+                Image = 4483362458,
+            })
+        end
+    end,
+})
+
+local TeleportDermaga2 = TeleportTab:CreateButton({
+    Name = "Teleport to Dermaga 2",
+    Callback = function()
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(428.08902, -164.649597, 3150.53003, -0.987926483, 5.54745583e-08, -0.154923454, 6.4455925e-08, 1, -5.29497548e-08, 0.154923454, -6.2296202e-08, -0.987926483)
+            Rayfield:Notify({
+                Title = "Teleported",
+                Content = "Teleported to Dermaga 2.",
+                Duration = 3,
+                Image = 4483362458,
+            })
+        end
     end,
 })
 
