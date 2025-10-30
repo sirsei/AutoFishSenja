@@ -4,7 +4,7 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 -- Create the main window
 local Window = Rayfield:CreateWindow({
     Name = "SENJA AUTOFISH V1",
-    LoadingTitle = "Loading SeiAUTOFISH...",
+    LoadingTitle = "Loading Bentar...",
     LoadingSubtitle = "by Sei",
     ConfigurationSaving = {
         Enabled = true,
@@ -71,13 +71,12 @@ end
 local function autoFish()
     if tool.Parent ~= character then
         tool.Parent = character
-        wait(0.5)
+        wait(0)
     end
     castEvent:FireServer(false, 100)
-    wait(2)
-    wait(3)
+    wait(5)
     miniGameRemote:FireServer(true)
-    wait(1)
+    wait(0.5)
     if announceEnabled then
         local fish = getLatestFish()
         if fish then
