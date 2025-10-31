@@ -24,12 +24,12 @@ local player = game:GetService("Players").LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local backpack = player.Backpack
 
--- Wait for tool "Darkritual"
-local tool = character:FindFirstChild("Darkritual") or backpack:FindFirstChild("Darkritual")
+-- Wait for tool "Krampus"
+local tool = character:FindFirstChild("Krampus") or backpack:FindFirstChild("Krampus")
 if not tool then
     Rayfield:Notify({
         Title = "Error",
-        Content = "Tool 'Darkritual' not found! Make sure you have this tool.",
+        Content = "Tool 'Krampus' not found! Make sure you have this tool.",
         Duration = 5,
         Image = 4483362458,
         Actions = {
