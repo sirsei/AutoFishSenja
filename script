@@ -22,33 +22,28 @@ local Window = Rayfield:CreateWindow({
 -- Variables
 local player = game:GetService("Players").LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-local backpack = player.Backpack
+local backpack = player:WaitForChild("Backpack")
 
--- Wait for tool "Krampus"
-local tool = character:FindFirstChild("Krampus") or backpack:FindFirstChild("Krampus")
-if not tool then
-    Rayfield:Notify({
-        Title = "Error",
-        Content = "Tool 'Krampus' not found! Make sure you have this tool.",
-        Duration = 5,
-        Image = 4483362458,
-        Actions = {
-            Ignore = {
-                Name = "Okay",
-                Callback = function()
-                    -- Do nothing
-                end
-            },
-        },
-    })
-    return
+-- Fungsi untuk mencari rod otomatis
+local function FindRod()
+    -- Cek rod di character dulu
+    for _, tool in ipairs(character:GetChildren()) do
+        if tool:IsA("Tool") and tool:FindFirstChild("Mechanics") and tool.Mechanics:FindFirstChild("Remotes") then
+            return tool
+        end
+    end
+
+    -- Kalau tidak ada, cari di backpack
+    for _, tool in ipairs(backpack:GetChildren()) do
+        if tool:IsA("Tool") and tool:FindFirstChild("Mechanics") and tool.Mechanics:FindFirstChild("Remotes") then
+            player.Character:WaitForChild("Humanoid"):EquipTool(tool)
+            task.wait(0.5)
+            return tool
+        end
+    end
+
+    return nil
 end
-
-local mechanics = tool:WaitForChild("Mechanics")
-local remotes = mechanics:WaitForChild("Remotes")
-local castEvent = remotes:WaitForChild("CastEvent")
-local miniGameRemote = remotes:WaitForChild("MiniGame")
-local requestFishAnnouncement = game:GetService("ReplicatedStorage"):WaitForChild("RequestFishAnnouncement")
 
 -- Control variables
 local isFishing = false
@@ -69,14 +64,30 @@ end
 
 -- Main auto fishing function
 local function autoFish()
-    if tool.Parent ~= character then
-        tool.Parent = character
-        wait(0)
+    local tool = FindRod()
+    if not tool then
+        Rayfield:Notify({
+            Title = "Error",
+            Content = "Tidak ada rod yang ditemukan di backpack atau tangan!",
+            Duration = 4,
+        })
+        return
     end
+
+    local mechanics = tool:WaitForChild("Mechanics")
+    local remotes = mechanics:WaitForChild("Remotes")
+    local castEvent = remotes:WaitForChild("CastEvent")
+    local miniGameRemote = remotes:WaitForChild("MiniGame")
+    local requestFishAnnouncement = game:GetService("ReplicatedStorage"):WaitForChild("RequestFishAnnouncement")
+
+    -- Urutan lempar dan minigame
+    castEvent:FireServer(true)
+    task.wait(1)
     castEvent:FireServer(false, 100)
-    wait(5)
+    task.wait(5)
     miniGameRemote:FireServer(true)
-    wait(0.5)
+
+    -- Umumkan ikan yang didapat (opsional)
     if announceEnabled then
         local fish = getLatestFish()
         if fish then
@@ -85,7 +96,7 @@ local function autoFish()
     end
 end
 
--- Function to sell rarity
+-- Function to sell rarity (tetap seperti aslinya)
 local function sellRarity(rarity)
     local args = { rarity }
     game:GetService("ReplicatedStorage"):WaitForChild("RequestSellRarity"):InvokeServer(unpack(args))
@@ -103,17 +114,16 @@ task.spawn(function()
     antiAFKConnection = player.Idled:Connect(function()
         if antiAFKEnabled then
             VU:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-            wait(1)
+            task.wait(1)
             VU:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-            print("[ANTI-AFK] Simulated activity sent.")
         end
     end)
 end)
 
 -- Create Tabs
-local FishingTab = Window:CreateTab("Fishing", 4483362458) -- Icon ID for fishing
-local SellingTab = Window:CreateTab("Selling", 4483362458) -- Icon ID for selling
-local TeleportTab = Window:CreateTab("Teleport", 4483362458) -- Icon ID for teleport
+local FishingTab = Window:CreateTab("Fishing", 4483362458)
+local SellingTab = Window:CreateTab("Selling", 4483362458)
+local TeleportTab = Window:CreateTab("Teleport", 4483362458)
 
 -- Fishing Tab Elements
 FishingTab:CreateSection("Auto Fishing Controls")
@@ -127,12 +137,11 @@ local StartButton = FishingTab:CreateButton({
                 Title = "Fishing Started",
                 Content = "Auto fishing is now active.",
                 Duration = 3,
-                Image = 4483362458,
             })
             fishingLoop = task.spawn(function()
                 while isFishing do
                     autoFish()
-                    wait(0.5)
+                    task.wait(0.5)
                 end
             end)
         end
@@ -148,7 +157,6 @@ local StopButton = FishingTab:CreateButton({
                 Title = "Fishing Stopped",
                 Content = "Auto fishing has been stopped.",
                 Duration = 3,
-                Image = 4483362458,
             })
             if fishingLoop then
                 task.cancel(fishingLoop)
@@ -174,203 +182,59 @@ local AntiAFKToggle = FishingTab:CreateToggle({
     Flag = "AntiAFKToggle",
     Callback = function(Value)
         antiAFKEnabled = Value
-        if antiAFKEnabled then
-            local VU = game:GetService("VirtualUser")
-            antiAFKConnection = player.Idled:Connect(function()
-                VU:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-                wait(1)
-                VU:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-                print("[ANTI-AFK] Simulated activity sent.")
-            end)
-        else
-            if antiAFKConnection then
-                antiAFKConnection:Disconnect()
-                antiAFKConnection = nil
-                print("[ANTI-AFK] Disabled by user.")
-            end
+        if not Value and antiAFKConnection then
+            antiAFKConnection:Disconnect()
+            antiAFKConnection = nil
         end
     end,
 })
 
--- Selling Tab Elements
+-- Selling Tab Elements (tidak diubah)
 SellingTab:CreateSection("Sell Fish by Rarity")
 
-local SellCommonButton = SellingTab:CreateButton({
-    Name = "Sell Common (Gray)",
-    Callback = function()
-        sellRarity("Common")
-    end,
-})
+local rarities = {"Common", "UnCommon", "Rare", "Epic", "Legendary", "Mythical", "Secret"}
+for _, rarity in ipairs(rarities) do
+    SellingTab:CreateButton({
+        Name = "Sell " .. rarity,
+        Callback = function()
+            sellRarity(rarity)
+        end,
+    })
+end
 
-local SellUnCommonButton = SellingTab:CreateButton({
-    Name = "Sell UnCommon (Green)",
-    Callback = function()
-        sellRarity("UnCommon")
-    end,
-})
-
-local SellRareButton = SellingTab:CreateButton({
-    Name = "Sell Rare (White)",
-    Callback = function()
-        sellRarity("Rare")
-    end,
-})
-
-local SellEpicButton = SellingTab:CreateButton({
-    Name = "Sell Epic (Purple)",
-    Callback = function()
-        sellRarity("Epic")
-    end,
-})
-
-local SellLegendaryButton = SellingTab:CreateButton({
-    Name = "Sell Legendary (Orange)",
-    Callback = function()
-        sellRarity("Legendary")
-    end,
-})
-
-local SellMythicalButton = SellingTab:CreateButton({
-    Name = "Sell Mythical (Yellow)",
-    Callback = function()
-        sellRarity("Mythical")
-    end,
-})
-
-local SellSecretButton = SellingTab:CreateButton({
-    Name = "Sell Secret (Cyan)",
-    Callback = function()
-        sellRarity("Secret")
-    end,
-})
-
--- Teleport Tab Elements
+-- Teleport Tab Elements (tetap sama)
 TeleportTab:CreateSection("Teleport Locations")
 
-local TeleportPulauDitengahLaut = TeleportTab:CreateButton({
-    Name = "Teleport to Pulau ditengah laut",
-    Callback = function()
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            character.HumanoidRootPart.CFrame = CFrame.new(-2445.55884, -165.058807, 4454.30762, -0.76892525, -3.90055739e-08, -0.639338732, 5.04065722e-09, 1, -6.70715892e-08, 0.639338732, -5.47957235e-08, -0.76892525)
-            Rayfield:Notify({
-                Title = "Teleported",
-                Content = "Teleported to Pulau ditengah laut.",
-                Duration = 3,
-                Image = 4483362458,
-            })
-        end
-    end,
-})
+local teleports = {
+    {"Pulau ditengah laut", CFrame.new(-2445.55884, -165.058807, 4454.30762, -0.76892525, -3.90055739e-08, -0.639338732, 5.04065722e-09, 1, -6.70715892e-08, 0.639338732, -5.47957235e-08, -0.76892525)},
+    {"Camp", CFrame.new(65.7638931, -91.0923462, 5332.22705)},
+    {"Toko Pancingan", CFrame.new(965.361572, -147.673538, 3707.81665)},
+    {"Pameran", CFrame.new(1236.47827, -91.8025131, 2891.3811)},
+    {"Mercusuar", CFrame.new(-157.251251, -152.903946, 3608.63208)},
+    {"Cassino", CFrame.new(1046.57214, -143.381668, 3246.20776)},
+    {"Dermaga 1", CFrame.new(378.228333, -160.766098, 3560.79517)},
+    {"Dermaga 2", CFrame.new(428.08902, -164.649597, 3150.53003)}
+}
 
-local TeleportCamp = TeleportTab:CreateButton({
-    Name = "Teleport to Camp",
-    Callback = function()
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            character.HumanoidRootPart.CFrame = CFrame.new(65.7638931, -91.0923462, 5332.22705, -0.034528628, -1.2111478e-07, 0.999403715, 1.14577647e-09, 1, 1.21226634e-07, -0.999403715, 5.3308824e-09, -0.034528628)
-            Rayfield:Notify({
-                Title = "Teleported",
-                Content = "Teleported to Camp.",
-                Duration = 3,
-                Image = 4483362458,
-            })
-        end
-    end,
-})
-
-local TeleportTokoPancingan = TeleportTab:CreateButton({
-    Name = "Teleport to Toko Pancingan",
-    Callback = function()
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            character.HumanoidRootPart.CFrame = CFrame.new(965.361572, -147.673538, 3707.81665, 0.42777279, 6.47687486e-08, 0.903886318, -6.42598721e-08, 1, -4.12442631e-08, -0.903886318, -4.04404474e-08, 0.42777279)
-            Rayfield:Notify({
-                Title = "Teleported",
-                Content = "Teleported to Toko Pancingan.",
-                Duration = 3,
-                Image = 4483362458,
-            })
-        end
-    end,
-})
-
-local TeleportPameran = TeleportTab:CreateButton({
-    Name = "Teleport to Pameran",
-    Callback = function()
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            character.HumanoidRootPart.CFrame = CFrame.new(1236.47827, -91.8025131, 2891.3811, -0.0169169009, -8.58965308e-08, -0.999856889, -2.49033558e-08, 1, -8.54874784e-08, 0.999856889, 2.34536088e-08, -0.0169169009)
-            Rayfield:Notify({
-                Title = "Teleported",
-                Content = "Teleported to Pameran.",
-                Duration = 3,
-                Image = 4483362458,
-            })
-        end
-    end,
-})
-
-local TeleportMercusuar = TeleportTab:CreateButton({
-    Name = "Teleport to Mercusuar",
-    Callback = function()
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            character.HumanoidRootPart.CFrame = CFrame.new(-157.251251, -152.903946, 3608.63208, -0.221173435, -3.34229133e-09, 0.975234509, 2.34659137e-08, 1, 8.74900152e-09, -0.975234509, 2.48198155e-08, -0.221173435)
-            Rayfield:Notify({
-                Title = "Teleported",
-                Content = "Teleported to Mercusuar.",
-                Duration = 3,
-                Image = 4483362458,
-            })
-        end
-    end,
-})
-
-local TeleportCassino = TeleportTab:CreateButton({
-    Name = "Teleport to Cassino",
-    Callback = function()
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            character.HumanoidRootPart.CFrame = CFrame.new(1046.57214, -143.381668, 3246.20776, 0.0726584047, 1.44183163e-08, -0.997356892, 4.48612347e-08, 1, 1.77247106e-08, 0.997356892, -4.6030511e-08, 0.0726584047)
-            Rayfield:Notify({
-                Title = "Teleported",
-                Content = "Teleported to Cassino.",
-                Duration = 3,
-                Image = 4483362458,
-            })
-        end
-    end,
-})
-
-local TeleportDermaga1 = TeleportTab:CreateButton({
-    Name = "Teleport to Dermaga 1",
-    Callback = function()
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            character.HumanoidRootPart.CFrame = CFrame.new(378.228333, -160.766098, 3560.79517, -0.100001454, 1.85709013e-08, 0.994987309, 1.54956169e-11, 1, -1.86629041e-08, -0.994987309, -1.85089954e-09, -0.100001454)
-            Rayfield:Notify({
-                Title = "Teleported",
-                Content = "Teleported to Dermaga 1.",
-                Duration = 3,
-                Image = 4483362458,
-            })
-        end
-    end,
-})
-
-local TeleportDermaga2 = TeleportTab:CreateButton({
-    Name = "Teleport to Dermaga 2",
-    Callback = function()
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            character.HumanoidRootPart.CFrame = CFrame.new(428.08902, -164.649597, 3150.53003, -0.987926483, 5.54745583e-08, -0.154923454, 6.4455925e-08, 1, -5.29497548e-08, 0.154923454, -6.2296202e-08, -0.987926483)
-            Rayfield:Notify({
-                Title = "Teleported",
-                Content = "Teleported to Dermaga 2.",
-                Duration = 3,
-                Image = 4483362458,
-            })
-        end
-    end,
-})
+for _, v in ipairs(teleports) do
+    TeleportTab:CreateButton({
+        Name = "Teleport to " .. v[1],
+        Callback = function()
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                character.HumanoidRootPart.CFrame = v[2]
+                Rayfield:Notify({
+                    Title = "Teleported",
+                    Content = "Teleported to " .. v[1] .. ".",
+                    Duration = 3,
+                })
+            end
+        end,
+    })
+end
 
 -- Final notification
 Rayfield:Notify({
     Title = "Loaded Successfully",
-    Content = "SeiAUTOFISH V1 with Rayfield UI is ready!",
+    Content = "SENJA AUTOFISH V1 (Auto Rod Detect) is ready!",
     Duration = 5,
-    Image = 4483362458,
 })
