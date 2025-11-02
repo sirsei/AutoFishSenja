@@ -202,7 +202,7 @@ for _, rarity in ipairs(rarities) do
     })
 end
 
--- Teleport Tab Elements (tetap sama)
+-- Teleport Tab Elements
 TeleportTab:CreateSection("Teleport Locations")
 
 local teleports = {
@@ -213,7 +213,8 @@ local teleports = {
     {"Mercusuar", CFrame.new(-157.251251, -152.903946, 3608.63208)},
     {"Cassino", CFrame.new(1046.57214, -143.381668, 3246.20776)},
     {"Dermaga 1", CFrame.new(378.228333, -160.766098, 3560.79517)},
-    {"Dermaga 2", CFrame.new(428.08902, -164.649597, 3150.53003)}
+    {"Dermaga 2", CFrame.new(428.08902, -164.649597, 3150.53003)},
+    {"Secret Location", CFrame.new(-2372.63379, -165.760818, 5119.20605, 0.779839754, 9.30003026e-08, 0.625979185, -3.60900714e-08, 1, -1.03607e-07, -0.625979185, 5.82052238e-08, 0.779839754)}
 }
 
 for _, v in ipairs(teleports) do
@@ -235,6 +236,6 @@ end
 -- Final notification
 Rayfield:Notify({
     Title = "Loaded Successfully",
-    Content = "SENJA AUTOFISH V1 (Auto Rod Detect) is ready!",
+    Content = "SENJA AUTOFISH V1 (Final) is ready!",
     Duration = 5,
 })
